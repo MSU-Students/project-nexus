@@ -6,8 +6,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('My Web Service')
-    .setDescription('The My first API')
+    .setTitle('Project Nexus')
+    .setDescription('Project Nexus API')
     .setVersion('1.0')
     .addTag('web-service')
     .addTag('restful')
