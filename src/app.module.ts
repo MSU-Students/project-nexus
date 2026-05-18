@@ -8,6 +8,7 @@ import { RolesGuard } from './guards';
 import { AuthGuard } from './auth/auth.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities';
+import { ProjectModule } from './project/project.module';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { User } from './entities';
       synchronize: true
     }),
     UserModule, 
-    AuthModule
+    AuthModule, ProjectModule
   ],
   controllers: [AppController],
   providers: [
