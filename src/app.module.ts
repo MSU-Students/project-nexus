@@ -7,7 +7,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards';
 import { AuthGuard } from './auth/auth.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities';
+import { Person, Project, User } from './entities';
+import { ProjectModule } from './project/project.module';
 
 @Module({
   imports: [
@@ -18,11 +19,11 @@ import { User } from './entities';
       username: 'root',
       password: 'rootpass',
       database: 'project-nexus-db',
-      entities: [User],
+      entities: [User, Project, Person],
       synchronize: true
     }),
     UserModule, 
-    AuthModule
+    AuthModule, ProjectModule
   ],
   controllers: [AppController],
   providers: [
