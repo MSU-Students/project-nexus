@@ -7,7 +7,9 @@ import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards';
 import { AuthGuard } from './auth/auth.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities';
+import { User } from './entities/user.entity';
+import { DefenseSchedule } from './entities/defense-schedule.entity';
+import { DefenseScheduleModule } from './defense-schedule/defense-schedule.module';
 
 @Module({
   imports: [
@@ -15,27 +17,27 @@ import { User } from './entities';
       type: 'postgres',
       host: 'localhost',
       port: 5432,
-      username: 'root',
-      password: 'rootpass',
+      username: 'postgres',
+      password: '12345678',
       database: 'project-nexus-db',
-      entities: [User],
-      synchronize: true
+      entities: [User, DefenseSchedule],
+      synchronize: true,
     }),
-    UserModule, 
-    AuthModule
+    UserModule,
+    AuthModule,
+    DefenseScheduleModule,  // <-- added this
   ],
   controllers: [AppController],
   providers: [
     AppService,
     {
       provide: APP_GUARD,
-      useClass: AuthGuard
+      useClass: AuthGuard,
     },
     {
       provide: APP_GUARD,
-      useClass: RolesGuard
-
-    }
-  ]
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule { }
