@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ProjectModule } from './project/project.module';
 import { AssignmentModule } from './assignment/assignment.module';
+import { MilestoneModule } from './milestone/milestone.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards';
 import { AuthGuard } from './auth/auth.guard';
@@ -49,6 +50,7 @@ import {
     AuthModule,
     ProjectModule,
     AssignmentModule,
+    MilestoneModule,
   ],
   controllers: [AppController],
   providers: [
