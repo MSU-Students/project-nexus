@@ -1,4 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Project } from 'src/entities/project.entity';
@@ -16,11 +19,13 @@ export class ProjectService {
         private readonly historyRepository: Repository<ProjectStageHistory>,
     ) {}
 
+    // POST /projects
     async create(dto: CreateProjectDto): Promise<Project> {
         const project = this.projectRepository.create(dto);
         return this.projectRepository.save(project);
     }
 
+    // GET /projects
     async findAll(): Promise<Project[]> {
         return this.projectRepository.find({
             relations: ['stage'],
@@ -28,6 +33,7 @@ export class ProjectService {
         });
     }
 
+    // GET /projects/:id
     async findOne(id: number): Promise<Project> {
         const project = await this.projectRepository.findOne({
             where: { id },
@@ -37,23 +43,36 @@ export class ProjectService {
         return project;
     }
 
-    async updateStage(id: number, dto: UpdateProjectStageDto, changedBy?: number): Promise<Project> {
+    // PATCH /projects/:id/stage
+    async updateStage(
+        id: number,
+        dto: UpdateProjectStageDto,
+        changedBy?: number,
+    ): Promise<Project> {
         const project = await this.findOne(id);
 
-        const history = this.historyRepository.create({
+        const oldStageId = project.stageId ?? null;
+        const newStageId = dto.stageId;
+
+        // Record history entry
+        const historyEntry = this.historyRepository.create({
             projectId: project.id,
-            oldStageId: project.stageId ?? null,
-            newStageId: dto.stageId,
+            oldStageId: oldStageId,
+            newStageId: newStageId,
             changedBy: changedBy ?? null,
         });
-        await this.historyRepository.save(history);
+        await this.historyRepository.save(historyEntry);
 
-        project.stageId = dto.stageId;
+        // Update project stage
+        project.stageId = newStageId;
         return this.projectRepository.save(project);
     }
 
+    // GET /projects/:id/history
     async getHistory(id: number): Promise<ProjectStageHistory[]> {
+        // Ensure project exists
         await this.findOne(id);
+
         return this.historyRepository.find({
             where: { projectId: id },
             relations: ['oldStage', 'newStage', 'changedByUser'],
