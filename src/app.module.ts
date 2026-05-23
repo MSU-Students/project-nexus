@@ -7,7 +7,18 @@ import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards';
 import { AuthGuard } from './auth/auth.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User, Stage, Project, ProjectStageHistory } from './entities';
+import {
+  User,
+  Stage,
+  Project,
+  ProjectStageHistory,
+  Adviser,
+  Group,
+  AdviserAssignment,
+  Milestone,
+  ProjectMilestone,
+  SubmissionFile,
+} from './entities';
 
 @Module({
   imports: [
@@ -18,7 +29,18 @@ import { User, Stage, Project, ProjectStageHistory } from './entities';
       username: 'root',
       password: 'rootpass',
       database: 'project-nexus-db',
-      entities: [User, Stage, Project, ProjectStageHistory],
+      entities: [
+        User,
+        Stage,
+        Project,
+        ProjectStageHistory,
+        Adviser,
+        Group,
+        AdviserAssignment,
+        Milestone,
+        ProjectMilestone,
+        SubmissionFile,
+      ],
       synchronize: true
     }),
     UserModule, 
