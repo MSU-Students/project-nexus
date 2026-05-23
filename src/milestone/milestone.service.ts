@@ -67,7 +67,7 @@ export class MilestoneService {
             projectMilestoneId: id,
             fileName: file.originalname,
             filePath: file.path,
-            uploadedBy: uploadedBy ?? null,
+            uploadedBy: uploadedBy,
         });
 
         // Mark as submitted if not already approved/rejected

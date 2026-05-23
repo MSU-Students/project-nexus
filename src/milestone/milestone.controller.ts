@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     Controller,
     Get,
@@ -23,21 +24,6 @@ import { RejectMilestoneDto } from 'src/dto/reject-milestone.dto';
 @Controller()
 export class MilestoneController {
     constructor(private readonly milestoneService: MilestoneService) {}
-
-    // POST /projects/:id/milestones
-    @Post('projects/:id/milestones')
-    addMilestone(
-        @Param('id', ParseIntPipe) projectId: number,
-        @Body() dto: CreateProjectMilestoneDto,
-    ) {
-        return this.milestoneService.addMilestone(projectId, dto);
-    }
-
-    // GET /projects/:id/milestones
-    @Get('projects/:id/milestones')
-    getMilestones(@Param('id', ParseIntPipe) projectId: number) {
-        return this.milestoneService.getMilestones(projectId);
-    }
 
     // PATCH /milestones/:id/approve
     @Patch('milestones/:id/approve')
@@ -73,6 +59,9 @@ export class MilestoneController {
         @UploadedFile() file: Express.Multer.File,
         @Request() req: any,
     ) {
+        if (!file) {
+            throw new BadRequestException('No file uploaded');
+        }
         const uploadedBy: number | undefined = req.user?.sub ?? req.user?.id;
         return this.milestoneService.uploadFile(id, file, uploadedBy);
     }
