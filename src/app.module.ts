@@ -3,6 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { ProjectModule } from './project/project.module';
+import { AssignmentModule } from './assignment/assignment.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards';
 import { AuthGuard } from './auth/auth.guard';
@@ -43,8 +45,10 @@ import {
       ],
       synchronize: true
     }),
-    UserModule, 
-    AuthModule
+    UserModule,
+    AuthModule,
+    ProjectModule,
+    AssignmentModule,
   ],
   controllers: [AppController],
   providers: [
