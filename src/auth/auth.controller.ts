@@ -1,23 +1,16 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto } from 'src/dto';
-import { AuthGuard } from './auth.guard';
-import { ApiBearerAuth } from '@nestjs/swagger';
-import { Anonymous } from 'src/decorators';
+import { LoginDto } from './dto/login.dto';
+import { Public } from '../common';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
-    @Anonymous()
-    @HttpCode(HttpStatus.OK)
-    @Post('login')
-    login(@Body() signInDto: LoginDto) {
-        return this.authService.signIn(signInDto.username, signInDto.password);
-    }
-    @ApiBearerAuth()
-    @Get('profile')
-    getProfile(@Request() req) {
-        return req.user;
-    }
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
+  login(@Body() dto: LoginDto) {
+    return this.authService.login(dto);
+  }
 }
