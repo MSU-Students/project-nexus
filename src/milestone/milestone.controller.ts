@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     Controller,
     Get,
@@ -73,6 +74,9 @@ export class MilestoneController {
         @UploadedFile() file: Express.Multer.File,
         @Request() req: any,
     ) {
+        if (!file) {
+            throw new BadRequestException('No file uploaded');
+        }
         const uploadedBy: number | undefined = req.user?.sub ?? req.user?.id;
         return this.milestoneService.uploadFile(id, file, uploadedBy);
     }

@@ -34,7 +34,6 @@ import {
 
     // Database connection reads values from .env
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',

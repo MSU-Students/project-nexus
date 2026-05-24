@@ -9,6 +9,5 @@ import { ProjectService } from './project.service';
     imports: [TypeOrmModule.forFeature([Project, ProjectStageHistory])],
     controllers: [ProjectController],
     providers: [ProjectService],
-    exports: [ProjectService],
 })
 export class ProjectModule {}

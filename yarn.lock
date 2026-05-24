@@ -971,17 +971,17 @@
     jsonc-parser "3.3.1"
     pluralize "8.0.0"
 
-"@nestjs/swagger@^11.3.0":
-  version "11.3.0"
-  resolved "https://registry.npmjs.org/@nestjs/swagger/-/swagger-11.3.0.tgz"
-  integrity sha512-SCS8fG2DL/ZF+9l5in09FwPhpBo5i1Gdo8Se3GYlJ2cn+iNTzF7u13QjHo5XI92BN8DN+Gcug+QTcmWmGvZyNw==
+"@nestjs/swagger@^11.4.4":
+  version "11.4.4"
+  resolved "https://registry.npmjs.org/@nestjs/swagger/-/swagger-11.4.4.tgz"
+  integrity sha512-VaIo1ruV2G7b+f2zPzkBSUNy9a/WQ9sg8TLKhWlrTfg4O6U10M/PA7Xi6XMXadOVhwOqoesijba8jH3i/3adrA==
   dependencies:
     "@microsoft/tsdoc" "0.16.0"
     "@nestjs/mapped-types" "2.1.1"
     js-yaml "4.1.1"
     lodash "4.18.1"
     path-to-regexp "8.4.2"
-    swagger-ui-dist "5.32.4"
+    swagger-ui-dist "5.32.6"
 
 "@nestjs/testing@^11.0.1":
   version "11.1.19"
@@ -2563,7 +2563,7 @@ expect@^30.0.0, expect@30.3.0:
     jest-mock "30.3.0"
     jest-util "30.3.0"
 
-express@5.2.1:
+"express@>=4.0.0 || >=5.0.0-beta", express@5.2.1:
   version "5.2.1"
   resolved "https://registry.npmjs.org/express/-/express-5.2.1.tgz"
   integrity sha512-hIS4idWWai69NezIdRt2xFVofaF4j+6INOpJlVOLDO8zXGpUVEVzIYk12UUi2JzjEzWL3IOAxcTubgz9Po0yXw==
@@ -4769,12 +4769,19 @@ supports-color@^8.1.1:
   dependencies:
     has-flag "^4.0.0"
 
-swagger-ui-dist@5.32.4:
-  version "5.32.4"
-  resolved "https://registry.npmjs.org/swagger-ui-dist/-/swagger-ui-dist-5.32.4.tgz"
-  integrity sha512-0AADFFQNJzExEN49SrD/34Nn9cxNxVLiydYl2MBwSZFPVXNkVwC/EFAjoezGGqE8oDegiDC+p47t8lKObCinMQ==
+swagger-ui-dist@>=5.0.0, swagger-ui-dist@5.32.6:
+  version "5.32.6"
+  resolved "https://registry.npmjs.org/swagger-ui-dist/-/swagger-ui-dist-5.32.6.tgz"
+  integrity sha512-75ttZNaYCLoFPnozPZcTUU6mS3wKT8l7WLjU5zJSHFeJa23i5vtnze6IiCl4jDMPeQTXVXIgovq4M11NNfQvSA==
   dependencies:
     "@scarf/scarf" "=1.4.0"
+
+swagger-ui-express@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.npmjs.org/swagger-ui-express/-/swagger-ui-express-5.0.1.tgz"
+  integrity sha512-SrNU3RiBGTLLmFU8GIJdOdanJTl4TOmT27tt3bWWHppqYmAZ6IDuEuBvMU6nZq0zLEe6b/1rACXCgLZqO6ZfrA==
+  dependencies:
+    swagger-ui-dist ">=5.0.0"
 
 symbol-observable@4.0.0:
   version "4.0.0"
