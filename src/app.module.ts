@@ -27,6 +27,8 @@ import { ArchiveLog } from './archive-logs/archive-log.entity';
       database: 'project-nexus-db',
       entities: [User, Project, ProjectMember, Manuscript, ArchiveLog],
       synchronize: true,
+      // Production: Set synchronize: false and run the migration manually:
+      //   psql -U root -d project-nexus-db -f src/database/migrations/001-initial-schema.sql
     }),
     CommonModule,
     UserModule,
