@@ -9,6 +9,8 @@ import { User } from './users/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { ProjectModule } from './projects/project.module';
 import { Project } from './projects/project.entity';
+import { ProjectMemberModule } from './project-members/project-member.module';
+import { ProjectMember } from './project-members/project-member.entity';
 
 @Module({
   imports: [
@@ -19,13 +21,14 @@ import { Project } from './projects/project.entity';
       username: 'root',
       password: 'rootpass',
       database: 'project-nexus-db',
-      entities: [User, Project],
+      entities: [User, Project, ProjectMember],
       synchronize: true,
     }),
     CommonModule,
     UserModule,
     AuthModule,
     ProjectModule,
+    ProjectMemberModule,
   ],
   controllers: [AppController],
   providers: [
