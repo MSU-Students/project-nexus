@@ -14,12 +14,12 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors();
+
   const config = new DocumentBuilder()
-    .setTitle('Project Nexus')
-    .setDescription('Project Nexus API')
+    .setTitle('Thesis Digital Archive')
+    .setDescription('Backend API for the Thesis Digital Archive & Reference Repository system')
     .setVersion('1.0')
-    .addTag('web-service')
-    .addTag('restful')
     .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
