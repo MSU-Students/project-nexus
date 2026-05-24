@@ -11,6 +11,8 @@ import { ProjectModule } from './projects/project.module';
 import { Project } from './projects/project.entity';
 import { ProjectMemberModule } from './project-members/project-member.module';
 import { ProjectMember } from './project-members/project-member.entity';
+import { ManuscriptModule } from './manuscripts/manuscript.module';
+import { Manuscript } from './manuscripts/manuscript.entity';
 
 @Module({
   imports: [
@@ -21,7 +23,7 @@ import { ProjectMember } from './project-members/project-member.entity';
       username: 'root',
       password: 'rootpass',
       database: 'project-nexus-db',
-      entities: [User, Project, ProjectMember],
+      entities: [User, Project, ProjectMember, Manuscript],
       synchronize: true,
     }),
     CommonModule,
@@ -29,6 +31,7 @@ import { ProjectMember } from './project-members/project-member.entity';
     AuthModule,
     ProjectModule,
     ProjectMemberModule,
+    ManuscriptModule,
   ],
   controllers: [AppController],
   providers: [
