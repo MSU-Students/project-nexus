@@ -1,27 +1,18 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './user/user.module';
+import { CommonModule, AuthGuard, RolesGuard } from './common';
+import { UserModule } from './users/user.module';
+import { User } from './users/user.entity';
 import { AuthModule } from './auth/auth.module';
-import { ProjectModule } from './project/project.module';
-import { AssignmentModule } from './assignment/assignment.module';
-import { MilestoneModule } from './milestone/milestone.module';
-import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from './guards';
-import { AuthGuard } from './auth/auth.guard';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import {
-  User,
-  Stage,
-  Project,
-  ProjectStageHistory,
-  Adviser,
-  Group,
-  AdviserAssignment,
-  Milestone,
-  ProjectMilestone,
-  SubmissionFile,
-} from './entities';
+import { ProjectModule } from './projects/project.module';
+import { Project } from './projects/project.entity';
+import { ProjectMemberModule } from './project-members/project-member.module';
+import { ProjectMember } from './project-members/project-member.entity';
+import { ManuscriptModule } from './manuscripts/manuscript.module';
+import { Manuscript } from './manuscripts/manuscript.entity';
 
 @Module({
   imports: [
@@ -32,38 +23,21 @@ import {
       username: 'root',
       password: 'rootpass',
       database: 'project-nexus-db',
-      entities: [
-        User,
-        Stage,
-        Project,
-        ProjectStageHistory,
-        Adviser,
-        Group,
-        AdviserAssignment,
-        Milestone,
-        ProjectMilestone,
-        SubmissionFile,
-      ],
-      synchronize: true
+      entities: [User, Project, ProjectMember, Manuscript],
+      synchronize: true,
     }),
+    CommonModule,
     UserModule,
     AuthModule,
     ProjectModule,
-    AssignmentModule,
-    MilestoneModule,
+    ProjectMemberModule,
+    ManuscriptModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard
-
-    }
-  ]
+    { provide: APP_GUARD, useClass: AuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
+  ],
 })
-export class AppModule { }
+export class AppModule {}
