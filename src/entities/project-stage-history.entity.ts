@@ -23,7 +23,7 @@ export class ProjectStageHistory {
     project: Project;
 
     @Column({ name: 'old_stage_id', nullable: true })
-    oldStageId: number;
+    oldStageId?: number;
 
     @ManyToOne(() => Stage, { nullable: true, eager: false })
     @JoinColumn({ name: 'old_stage_id' })
@@ -37,7 +37,7 @@ export class ProjectStageHistory {
     newStage: Stage;
 
     @Column({ name: 'changed_by', nullable: true })
-    changedBy: number;
+    changedBy?: number;
 
     @ManyToOne(() => User, { nullable: true, eager: false })
     @JoinColumn({ name: 'changed_by' })

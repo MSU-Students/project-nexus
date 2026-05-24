@@ -30,7 +30,7 @@ export class AdviserAssignment {
     group: Group;
 
     @Column({ name: 'assigned_by', nullable: true })
-    assignedBy: number;
+    assignedBy?: number;
 
     @ManyToOne(() => User, { nullable: true, eager: false })
     @JoinColumn({ name: 'assigned_by' })
