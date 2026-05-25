@@ -16,7 +16,7 @@ export class AssignmentService {
         const assignment = this.assignmentRepository.create({
             adviserId: dto.adviserId,
             groupId: dto.groupId,
-            assignedBy: assignedBy,
+            assignedBy: assignedBy ?? dto.assignedBy,
         });
         return this.assignmentRepository.save(assignment);
     }

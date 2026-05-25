@@ -25,21 +25,6 @@ import { RejectMilestoneDto } from 'src/dto/reject-milestone.dto';
 export class MilestoneController {
     constructor(private readonly milestoneService: MilestoneService) {}
 
-    // POST /projects/:id/milestones
-    @Post('projects/:id/milestones')
-    addMilestone(
-        @Param('id', ParseIntPipe) projectId: number,
-        @Body() dto: CreateProjectMilestoneDto,
-    ) {
-        return this.milestoneService.addMilestone(projectId, dto);
-    }
-
-    // GET /projects/:id/milestones
-    @Get('projects/:id/milestones')
-    getMilestones(@Param('id', ParseIntPipe) projectId: number) {
-        return this.milestoneService.getMilestones(projectId);
-    }
-
     // PATCH /milestones/:id/approve
     @Patch('milestones/:id/approve')
     approve(@Param('id', ParseIntPipe) id: number) {
