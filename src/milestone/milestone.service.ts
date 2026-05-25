@@ -70,7 +70,6 @@ export class MilestoneService {
             uploadedBy: uploadedBy,
         });
 
-        // Mark as submitted if not already approved/rejected
         await this.projectMilestoneRepository.update(id, {
             submittedAt: new Date(),
         });

@@ -13,6 +13,5 @@ import { MilestoneModule } from 'src/milestone/milestone.module';
     ],
     controllers: [ProjectController],
     providers: [ProjectService],
-    exports: [ProjectService],
 })
 export class ProjectModule {}

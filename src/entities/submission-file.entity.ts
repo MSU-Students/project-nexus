@@ -27,7 +27,7 @@ export class SubmissionFile {
     filePath: string;
 
     @Column({ name: 'uploaded_by', nullable: true })
-    uploadedBy: number;
+    uploadedBy?: number;
 
     @ManyToOne(() => User, { nullable: true, eager: false })
     @JoinColumn({ name: 'uploaded_by' })

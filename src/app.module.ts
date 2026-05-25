@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards';
 import { AuthGuard } from './auth/auth.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
   User,
   Stage,
@@ -25,27 +26,38 @@ import {
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'root',
-      password: 'rootpass',
-      database: 'project-nexus-db',
-      entities: [
-        User,
-        Stage,
-        Project,
-        ProjectStageHistory,
-        Adviser,
-        Group,
-        AdviserAssignment,
-        Milestone,
-        ProjectMilestone,
-        SubmissionFile,
-      ],
-      synchronize: true
+    // Load .env globally so all modules can use ConfigService
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
     }),
+
+    // Database connection reads values from .env
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        type: 'postgres',
+        host: config.get<string>('DB_HOST', 'localhost'),
+        port: config.get<number>('DB_PORT', 5432),
+        username: config.get<string>('DB_USERNAME', 'postgres'),
+        password: config.get<string>('DB_PASSWORD', 'postgres'),
+        database: config.get<string>('DB_NAME', 'project_nexus'),
+        entities: [
+          User,
+          Stage,
+          Project,
+          ProjectStageHistory,
+          Adviser,
+          Group,
+          AdviserAssignment,
+          Milestone,
+          ProjectMilestone,
+          SubmissionFile,
+        ],
+        synchronize: true,
+      }),
+    }),
+
     UserModule,
     AuthModule,
     ProjectModule,
@@ -57,13 +69,12 @@ import {
     AppService,
     {
       provide: APP_GUARD,
-      useClass: AuthGuard
+      useClass: AuthGuard,
     },
     {
       provide: APP_GUARD,
-      useClass: RolesGuard
-
-    }
-  ]
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule { }

@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateAssignmentDto {
     @ApiProperty()
@@ -6,7 +6,4 @@ export class CreateAssignmentDto {
 
     @ApiProperty()
     groupId: number;
-
-    @ApiPropertyOptional()
-    assignedBy?: number;
 }

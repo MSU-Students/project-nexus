@@ -51,10 +51,6 @@ export class ProjectService {
     ): Promise<Project> {
         const project = await this.findOne(id);
 
-        const oldStageId = project.stageId ?? null;
-        const newStageId = dto.stageId;
-
-        // Record history entry
         const historyEntry = this.historyRepository.create({
             projectId: project.id,
             oldStageId: oldStageId,
@@ -63,14 +59,12 @@ export class ProjectService {
         });
         await this.historyRepository.save(historyEntry);
 
-        // Update project stage
-        project.stageId = newStageId;
+        project.stageId = dto.stageId;
         return this.projectRepository.save(project);
     }
 
     // GET /projects/:id/history
     async getHistory(id: number): Promise<ProjectStageHistory[]> {
-        // Ensure project exists
         await this.findOne(id);
 
         return this.historyRepository.find({

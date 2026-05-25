@@ -9,7 +9,7 @@ export class AssignmentService {
     constructor(
         @InjectRepository(AdviserAssignment)
         private readonly assignmentRepository: Repository<AdviserAssignment>,
-    ) {}
+    ) { }
 
     // POST /assignments
     async create(dto: CreateAssignmentDto, assignedBy?: number): Promise<AdviserAssignment> {
