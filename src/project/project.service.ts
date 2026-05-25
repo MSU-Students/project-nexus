@@ -59,7 +59,7 @@ export class ProjectService {
             projectId: project.id,
             oldStageId: oldStageId,
             newStageId: newStageId,
-            changedBy: changedBy ?? null,
+            changedBy: changedBy,
         });
         await this.historyRepository.save(historyEntry);
 

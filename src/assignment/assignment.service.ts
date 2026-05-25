@@ -14,8 +14,9 @@ export class AssignmentService {
     // POST /assignments
     async create(dto: CreateAssignmentDto, assignedBy?: number): Promise<AdviserAssignment> {
         const assignment = this.assignmentRepository.create({
-            ...dto,
-            assignedBy: assignedBy ?? dto.assignedBy ?? null,
+            adviserId: dto.adviserId,
+            groupId: dto.groupId,
+            assignedBy: assignedBy ?? dto.assignedBy,
         });
         return this.assignmentRepository.save(assignment);
     }
@@ -31,13 +32,14 @@ export class AssignmentService {
 
     // GET /groups/:id/adviser
     async getAdviserByGroup(groupId: number): Promise<AdviserAssignment> {
-        const assignment = await this.assignmentRepository.findOne({
+        const results = await this.assignmentRepository.find({
             where: { groupId },
             relations: ['adviser', 'adviser.faculty'],
             order: { assignedAt: 'DESC' },
+            take: 1,
         });
-        if (!assignment) throw new NotFoundException(`No adviser assigned to group #${groupId}`);
-        return assignment;
+        if (!results.length) throw new NotFoundException(`No adviser assigned to group #${groupId}`);
+        return results[0];
     }
 
     // DELETE /assignments/:id
