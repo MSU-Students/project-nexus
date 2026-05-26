@@ -6,4 +6,6 @@ export class CreateAssignmentDto {
 
     @ApiProperty()
     groupId: number;
+
+    assignedBy?: string;
 }
