@@ -59,7 +59,7 @@ export class ProjectService {
             changedBy: changedBy,
         });
         await this.historyRepository.save(historyEntry);
-        
+
         project.stageId = dto.stageId;
         return this.projectRepository.save(project);
     }
@@ -81,7 +81,7 @@ export class ProjectService {
 
         project.stageId = dto.stageId;
         return this.projectRepository.save(project);
-    }
+    }*/
 
     // GET /projects/:id/history
     async getHistory(id: number): Promise<ProjectStageHistory[]> {
@@ -92,5 +92,5 @@ export class ProjectService {
             relations: ['oldStage', 'newStage', 'changedByUser'],
             order: { changedAt: 'DESC' },
         });
-    }*/
+    }
 }
