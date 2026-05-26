@@ -44,6 +44,7 @@ export class ProjectService {
     }
 
     // PATCH /projects/:id/stage
+
     async updateStage(
         id: number,
         dto: UpdateProjectStageDto,
@@ -53,8 +54,27 @@ export class ProjectService {
 
         const historyEntry = this.historyRepository.create({
             projectId: project.id,
-            oldStageId: oldStageId,
-            newStageId: newStageId,
+            oldStageId: project.stageId, 
+            newStageId: dto.stageId,    
+            changedBy: changedBy,
+        });
+        await this.historyRepository.save(historyEntry);
+        
+        project.stageId = dto.stageId;
+        return this.projectRepository.save(project);
+    }
+
+   /* async updateStage(
+        id: number,
+        dto: UpdateProjectStageDto,
+        changedBy?: number,
+    ): Promise<Project> {
+        const project = await this.findOne(id);
+
+        const historyEntry = this.historyRepository.create({
+            projectId: project.id,
+            oldStageId: dto.oldStageId,
+            newStageId: dto.newStageId,
             changedBy: changedBy,
         });
         await this.historyRepository.save(historyEntry);
@@ -72,5 +92,5 @@ export class ProjectService {
             relations: ['oldStage', 'newStage', 'changedByUser'],
             order: { changedAt: 'DESC' },
         });
-    }
+    }*/
 }
