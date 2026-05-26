@@ -10,8 +10,8 @@ import { User } from 'src/entities/user.entity';
 import { AssignPanelDto, RemovePanelDto } from 'src/dto';
 import { Role } from 'src/enums';
 
-const MIN_PANELISTS = 2;
-const MAX_PANELISTS = 5;
+const MAX_PANELISTS = 3;
+const MIN_PANELISTS = 1;
 
 @Injectable()
 export class PanelAssignmentService {
