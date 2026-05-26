@@ -1,16 +1,24 @@
 import { Role } from 'src/enums';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { PanelAssignment } from './panel-assignment.entity';
 
-@Entity()
+@Entity('users')
 export class User {
     @PrimaryGeneratedColumn()
     id: number;
+
     @Column()
     name: string;
-    @Column()
+
+    @Column({ unique: true })
     username: string;
+
     @Column()
     password: string;
 
-    roles?: Role[];
+    @Column({ type: 'enum', enum: Role, default: Role.STUDENT })
+    role: Role;
+
+    @OneToMany(() => PanelAssignment, (pa: PanelAssignment) => pa.faculty)
+    panelAssignments: PanelAssignment[];
 }
