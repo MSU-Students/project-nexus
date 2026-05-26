@@ -14,7 +14,7 @@ export class AssignmentService {
     // POST /assignments
     async create(dto: CreateAssignmentDto, assignedBy?: number): Promise<AdviserAssignment> {
         const assignment = this.assignmentRepository.create({
-            adviserId: { id: dto.adviserId },
+            adviser: { id: dto.adviserId },
             groupId: { id: dto.groupId },
             assignedBy: assignedBy ?? dto.assignedBy,
         });
