@@ -9,5 +9,6 @@ import { MilestoneService } from './milestone.service';
     imports: [TypeOrmModule.forFeature([ProjectMilestone, SubmissionFile])],
     controllers: [MilestoneController],
     providers: [MilestoneService],
+    exports: [MilestoneService],
 })
 export class MilestoneModule {}

@@ -53,8 +53,8 @@ export class ProjectService {
 
         const historyEntry = this.historyRepository.create({
             projectId: project.id,
-            oldStageId: oldStageId,
-            newStageId: newStageId,
+            oldStageId: project.stageId,
+            newStageId: dto.stageId,
             changedBy: changedBy,
         });
         await this.historyRepository.save(historyEntry);
