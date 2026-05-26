@@ -11,6 +11,8 @@ import { RolesGuard } from './guards';
 import { AuthGuard } from './auth/auth.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DefenseSchedule } from './entities/defense-schedule.entity';
+import { PanelAssignment } from './entities/panel-assignment.entity';
 import {
   User,
   Stage,
@@ -22,8 +24,6 @@ import {
   Milestone,
   ProjectMilestone,
   SubmissionFile,
-  DefenseSchedule,
-  PanelAssignment,
 } from './entities';
 
 @Module({
