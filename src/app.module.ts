@@ -22,6 +22,8 @@ import {
   Milestone,
   ProjectMilestone,
   SubmissionFile,
+  DefenseSchedule,
+  PanelAssignment,
 } from './entities';
 
 @Module({
@@ -53,6 +55,8 @@ import {
           Milestone,
           ProjectMilestone,
           SubmissionFile,
+          DefenseSchedule,
+          PanelAssignment,
         ],
         synchronize: true,
       }),
