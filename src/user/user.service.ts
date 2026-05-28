@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from 'src/dto/create-user.dto';
 import { User } from 'src/entities';
 import { Role } from 'src/enums';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
@@ -26,6 +26,21 @@ export class UserService {
     }
     async create(createDto: CreateUserDto): Promise<User> {
         const user = this.usersRepository.create(createDto);
-        return this.usersRepository.save(user);
+
+        try {
+            return await this.usersRepository.save(user);
+        } catch (error) {
+            if (error instanceof QueryFailedError) {
+                const driverError = error.driverError as { code?: string; detail?: string };
+                const isUniqueViolation = driverError?.code === '23505';
+                const hasUsernameConflict = driverError?.detail?.includes('(username)=');
+
+                if (isUniqueViolation && hasUsernameConflict) {
+                    throw new ConflictException('Username already exists');
+                }
+            }
+
+            throw error;
+        }
     }
 }
