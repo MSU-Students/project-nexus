@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ProjectMilestone } from 'src/entities/project-milestone.entity';
-import { SubmissionFile } from 'src/entities/submission-file.entity';
 import { CreateProjectMilestoneDto } from 'src/dto/create-project-milestone.dto';
 import { RejectMilestoneDto } from 'src/dto/reject-milestone.dto';
+import { ProjectMilestone } from 'src/entities/project-milestone.entity';
+import { SubmissionFile } from 'src/entities/submission-file.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class MilestoneService {
@@ -81,5 +81,29 @@ export class MilestoneService {
         const entry = await this.projectMilestoneRepository.findOne({ where: { id } });
         if (!entry) throw new NotFoundException(`ProjectMilestone #${id} not found`);
         return entry;
+    }
+    /**
+     * Fetch milestone submission records for audit tracking
+     * APEX - MM - 005 — Milestone Monitoring Audit
+     */
+    async getMilestoneAuditTrail(projectId?: number, status?: string): Promise<ProjectMilestone[]> {
+        const query = this.projectMilestoneRepository
+            .createQueryBuilder('projectMilestone')
+            .leftJoinAndSelect('projectMilestone.project', 'project')
+            .leftJoinAndSelect('projectMilestone.milestone', 'milestone');
+
+        if (projectId) {
+            query.andWhere('projectMilestone.projectId = :projectId', { projectId });
+        }
+
+        if (status) {
+            query.andWhere('projectMilestone.status = :status', { status });
+        }
+
+        // Order by the most recent submission or review to keep the audit timeline linear
+        query.orderBy('projectMilestone.submittedAt', 'DESC')
+             .addOrderBy('projectMilestone.reviewedAt', 'DESC');
+
+        return query.getMany();
     }
 }
