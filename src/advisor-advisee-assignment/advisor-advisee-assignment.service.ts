@@ -86,4 +86,18 @@ export class AdvisorAdviseeAssignmentService {
         if (!assignment) throw new NotFoundException(`Assignment #${id} not found`);
         await this.assignmentRepository.remove(assignment);
     }
+
+    async getAdviserIdByUserId(userId: number): Promise<number> {
+        const adviser = await this.adviserRepository.findOne({
+            where: { facultyId: userId },
+        });
+        if (!adviser) {
+            throw new NotFoundException(
+                `No adviser record found for user #${userId}. ` +
+                `Ensure this faculty member has an adviser profile.`,
+            );
+        }
+        return adviser.id;
+    }
 }
+ 
