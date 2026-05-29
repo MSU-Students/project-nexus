@@ -20,8 +20,8 @@ export class ProjectService {
     ) {}
 
     // POST /projects
-    async create(dto: CreateProjectDto): Promise<Project> {
-        const project = this.projectRepository.create(dto);
+    async create(dto: CreateProjectDto, createdById?: number): Promise<Project> {
+        const project = this.projectRepository.create({ ...dto, createdById });
         return this.projectRepository.save(project);
     }
 

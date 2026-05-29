@@ -2,8 +2,9 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    ManyToOne,
+    Index,
     JoinColumn,
+    ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -15,8 +16,13 @@ export class Project {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Index()
     @Column()
     title: string;
+
+    @Index({ fulltext: true })
+    @Column({ nullable: true, type: 'text' })
+    abstract: string;
 
     @Column({ nullable: true, type: 'text' })
     description: string;
@@ -31,12 +37,28 @@ export class Project {
     @Column({ name: 'group_id', nullable: true })
     groupId: number;
 
+    @Index()
     @Column({ name: 'adviser_id', nullable: true })
     adviserId: number;
 
     @ManyToOne(() => User, { nullable: true, eager: false })
     @JoinColumn({ name: 'adviser_id' })
     adviser: User;
+
+    @Index()
+    @Column({ nullable: true })
+    year: string;
+
+    @Index()
+    @Column({ name: 'tech_stack', nullable: true })
+    techStack: string;
+
+    @Column({ name: 'created_by', nullable: true })
+    createdById: number;
+
+    @ManyToOne(() => User, { nullable: true, eager: false })
+    @JoinColumn({ name: 'created_by' })
+    createdBy: User;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;

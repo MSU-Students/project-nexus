@@ -26,8 +26,9 @@ export class ProjectController {
 
     // POST /projects
     @Post()
-    create(@Body() dto: CreateProjectDto) {
-        return this.projectService.create(dto);
+    create(@Body() dto: CreateProjectDto, @Request() req: any) {
+        const createdById: number | undefined = req.user?.sub ?? req.user?.id;
+        return this.projectService.create(dto, createdById);
     }
 
     // GET /projects

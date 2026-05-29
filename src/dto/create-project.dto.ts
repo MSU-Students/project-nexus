@@ -5,6 +5,9 @@ export class CreateProjectDto {
     title: string;
 
     @ApiPropertyOptional()
+    abstract?: string;
+
+    @ApiPropertyOptional()
     description?: string;
 
     @ApiPropertyOptional()
@@ -15,4 +18,10 @@ export class CreateProjectDto {
 
     @ApiPropertyOptional()
     adviserId?: number;
+
+    @ApiPropertyOptional()
+    year?: string;
+
+    @ApiPropertyOptional()
+    techStack?: string;
 }
