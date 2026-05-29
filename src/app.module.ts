@@ -6,6 +6,11 @@ import { AuthModule } from './auth/auth.module';
 import { ProjectModule } from './project/project.module';
 import { AssignmentModule } from './assignment/assignment.module';
 import { MilestoneModule } from './milestone/milestone.module';
+import { ProjectMemberModule } from './project-members/project-member.module';
+import { ManuscriptModule } from './manuscripts/manuscript.module';
+import { ArchiveLogModule } from './archive-logs/archive-log.module';
+import { DefenseScheduleModule } from './defense-schedule/defense-schedule.module';
+import { PanelAssignmentModule } from './panel-assignment/panel-assignment.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards';
 import { AuthGuard } from './auth/auth.guard';
@@ -24,6 +29,9 @@ import {
   Milestone,
   ProjectMilestone,
   SubmissionFile,
+  ProjectMember,
+  Manuscript,
+  ArchiveLog,
 } from './entities';
 
 @Module({
@@ -57,6 +65,9 @@ import {
           SubmissionFile,
           DefenseSchedule,
           PanelAssignment,
+          ProjectMember,
+          Manuscript,
+          ArchiveLog,
         ],
         synchronize: true,
       }),
@@ -67,6 +78,11 @@ import {
     ProjectModule,
     AssignmentModule,
     MilestoneModule,
+    ProjectMemberModule,
+    ManuscriptModule,
+    ArchiveLogModule,
+    DefenseScheduleModule,
+    PanelAssignmentModule,
   ],
   controllers: [AppController],
   providers: [

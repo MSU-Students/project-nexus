@@ -7,3 +7,6 @@ export * from './create-project-milestone.dto';
 export * from './reject-milestone.dto';
 export * from './panel-assignment.dto';
 export * from './defense-schedule.dto';
+export * from './create-project-member.dto';
+export * from './create-manuscript.dto';
+export * from './create-archive-log.dto';

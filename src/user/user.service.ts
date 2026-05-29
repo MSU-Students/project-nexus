@@ -1,9 +1,11 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from 'src/dto/create-user.dto';
 import { User } from 'src/entities';
-import { Role } from 'src/enums';
 import { QueryFailedError, Repository } from 'typeorm';
+
+const SALT_ROUNDS = 10;
 
 @Injectable()
 export class UserService {
@@ -13,19 +15,22 @@ export class UserService {
     ) {
     }
     
-    
     async findAll() {
         return this.usersRepository.find()
     }
-    async findOne(username: string): Promise<User | null> {
+
+    async findByEmail(email: string): Promise<User | null> {
         return this.usersRepository.findOne({
-            where: {
-                username: username
-            }
+            where: { email }
         });
     }
+
     async create(createDto: CreateUserDto): Promise<User> {
-        const user = this.usersRepository.create(createDto);
+        const passwordHash = await bcrypt.hash(createDto.password, SALT_ROUNDS);
+        const user = this.usersRepository.create({
+            ...createDto,
+            passwordHash,
+        });
 
         try {
             return await this.usersRepository.save(user);
@@ -33,10 +38,10 @@ export class UserService {
             if (error instanceof QueryFailedError) {
                 const driverError = error.driverError as { code?: string; detail?: string };
                 const isUniqueViolation = driverError?.code === '23505';
-                const hasUsernameConflict = driverError?.detail?.includes('(username)=');
+                const hasEmailConflict = driverError?.detail?.includes('(email)=');
 
-                if (isUniqueViolation && hasUsernameConflict) {
-                    throw new ConflictException('Username already exists');
+                if (isUniqueViolation && hasEmailConflict) {
+                    throw new ConflictException('Email already exists');
                 }
             }
 

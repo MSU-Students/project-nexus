@@ -19,13 +19,13 @@ export class PanelAssignmentController {
   constructor(private readonly panelService: PanelAssignmentService) { }
 
   @Post()
-  @Roles(Role.COORDINATOR)
+  @Roles(Role.ADMIN)
   assign(@Body() dto: AssignPanelDto) {
     return this.panelService.assign(dto);
   }
 
   @Delete()
-  @Roles(Role.COORDINATOR)
+  @Roles(Role.ADMIN)
   remove(@Body() dto: RemovePanelDto) {
     return this.panelService.remove(dto);
   }

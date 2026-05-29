@@ -27,8 +27,8 @@ export class PanelAssignmentService {
     // 1. Check faculty exists and is FACULTY role
     const faculty = await this.userRepo.findOne({ where: { id: dto.facultyId } });
     if (!faculty) throw new NotFoundException(`User #${dto.facultyId} not found`);
-    if (faculty.role !== Role.FACULTY) {
-      throw new BadRequestException(`User #${dto.facultyId} is not a faculty member`);
+    if (faculty.role !== Role.ADVISER) {
+      throw new BadRequestException(`User #${dto.facultyId} is not an adviser`);
     }
 
     // 2. Check max panelists

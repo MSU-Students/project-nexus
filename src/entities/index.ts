@@ -8,3 +8,6 @@ export * from './adviser-assignment.entity';
 export * from './milestone.entity';
 export * from './project-milestone.entity';
 export * from './submission-file.entity';
+export * from './project-member.entity';
+export * from './manuscript.entity';
+export * from './archive-log.entity';

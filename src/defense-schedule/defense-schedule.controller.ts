@@ -24,7 +24,7 @@ export class DefenseScheduleController {
 
   // Only COORDINATOR can create
   @Post()
-  @Roles(Role.COORDINATOR)
+  @Roles(Role.ADMIN)
   create(@Body() dto: CreateDefenseScheduleDto) {
     return this.scheduleService.create(dto);
   }
@@ -43,7 +43,7 @@ export class DefenseScheduleController {
 
   // Only COORDINATOR can update
   @Patch(':id')
-  @Roles(Role.COORDINATOR)
+  @Roles(Role.ADMIN)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateDefenseScheduleDto,
@@ -53,7 +53,7 @@ export class DefenseScheduleController {
 
   // Only COORDINATOR can delete
   @Delete(':id')
-  @Roles(Role.COORDINATOR)
+  @Roles(Role.ADMIN)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.scheduleService.remove(id);
   }

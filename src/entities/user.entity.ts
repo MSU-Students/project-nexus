@@ -1,5 +1,13 @@
 import { Role } from 'src/enums';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    Index,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 import { PanelAssignment } from './panel-assignment.entity';
 import { Project } from './project.entity';
 
@@ -8,17 +16,26 @@ export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    name: string;
+    @Index()
+    @Column({ name: 'full_name' })
+    fullName: string;
 
+    @Index()
     @Column({ unique: true })
-    username: string;
+    email: string;
 
-    @Column()
-    password: string;
+    @Column({ name: 'password_hash' })
+    passwordHash: string;
 
+    @Index()
     @Column({ type: 'enum', enum: Role, default: Role.STUDENT })
     role: Role;
+
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at' })
+    updatedAt: Date;
 
     @OneToMany(() => PanelAssignment, (pa: PanelAssignment) => pa.faculty)
     panelAssignments: PanelAssignment[];
