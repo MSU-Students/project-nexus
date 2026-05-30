@@ -10,19 +10,18 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 @ApiBearerAuth()
 @Controller('user')
 export class UserController {
-    constructor(private readonly service: UserService) { }
-    @Get()
-    // @Roles(Role.STUDENT, Role.ADMIN)
-    @Anonymous()
-    findAll() {
-        return this.service.findAll();
-    }
-    
-    @Post()
-    // @Roles(Role.ADMIN)
-    @Anonymous()
-    create(@Body() createDto: CreateUserDto) {
-        return this.service.create(createDto);
-    }
+  constructor(private readonly service: UserService) {}
+  @Get()
+  // @Roles(Role.STUDENT, Role.ADMIN)
+  @Anonymous()
+  findAll() {
+    return this.service.findAll();
+  }
 
+  @Post()
+  // @Roles(Role.ADMIN)
+  @Anonymous()
+  create(@Body() createDto: CreateUserDto) {
+    return this.service.create(createDto);
+  }
 }

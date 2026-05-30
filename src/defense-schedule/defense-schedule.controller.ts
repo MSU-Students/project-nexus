@@ -20,7 +20,7 @@ import {
 
 @Controller('defense-schedules')
 export class DefenseScheduleController {
-  constructor(private readonly scheduleService: DefenseScheduleService) { }
+  constructor(private readonly scheduleService: DefenseScheduleService) {}
 
   // Only COORDINATOR can create
   @Post()

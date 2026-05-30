@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DefenseSchedule } from 'src/entities/defense-schedule.entity';
@@ -13,7 +17,7 @@ export class DefenseScheduleService {
   constructor(
     @InjectRepository(DefenseSchedule)
     private readonly scheduleRepo: Repository<DefenseSchedule>,
-  ) { }
+  ) {}
 
   async create(dto: CreateDefenseScheduleDto): Promise<DefenseSchedule> {
     if (dto.startTime >= dto.endTime) {
@@ -38,18 +42,24 @@ export class DefenseScheduleService {
       query.andWhere('schedule.date = :date', { date: filter.date });
     }
 
-    query.orderBy('schedule.date', 'ASC').addOrderBy('schedule.startTime', 'ASC');
+    query
+      .orderBy('schedule.date', 'ASC')
+      .addOrderBy('schedule.startTime', 'ASC');
 
     return query.getMany();
   }
 
   async findOne(id: number): Promise<DefenseSchedule> {
     const schedule = await this.scheduleRepo.findOne({ where: { id } });
-    if (!schedule) throw new NotFoundException(`Defense schedule #${id} not found`);
+    if (!schedule)
+      throw new NotFoundException(`Defense schedule #${id} not found`);
     return schedule;
   }
 
-  async update(id: number, dto: UpdateDefenseScheduleDto): Promise<DefenseSchedule> {
+  async update(
+    id: number,
+    dto: UpdateDefenseScheduleDto,
+  ): Promise<DefenseSchedule> {
     const schedule = await this.findOne(id);
 
     const newStart = dto.startTime ?? schedule.startTime;

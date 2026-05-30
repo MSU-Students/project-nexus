@@ -5,9 +5,9 @@ import { ArchiveLogController } from './archive-log.controller';
 import { ArchiveLogService } from './archive-log.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([ArchiveLog])],
-    controllers: [ArchiveLogController],
-    providers: [ArchiveLogService],
-    exports: [ArchiveLogService],
+  imports: [TypeOrmModule.forFeature([ArchiveLog])],
+  controllers: [ArchiveLogController],
+  providers: [ArchiveLogService],
+  exports: [ArchiveLogService],
 })
 export class ArchiveLogModule {}

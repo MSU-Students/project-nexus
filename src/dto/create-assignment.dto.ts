@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateAssignmentDto {
-    @ApiProperty()
-    adviserId: number;
+  @ApiProperty()
+  adviserId: number;
 
-    @ApiProperty()
-    groupId: number;
+  @ApiProperty()
+  groupId: number;
 
-    @ApiProperty()
-    assignedBy?: number;
+  @ApiProperty()
+  assignedBy?: number;
 }

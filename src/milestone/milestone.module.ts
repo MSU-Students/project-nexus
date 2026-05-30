@@ -6,9 +6,9 @@ import { MilestoneController } from './milestone.controller';
 import { MilestoneService } from './milestone.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([ProjectMilestone, SubmissionFile])],
-    controllers: [MilestoneController],
-    providers: [MilestoneService],
-    exports: [MilestoneService],
+  imports: [TypeOrmModule.forFeature([ProjectMilestone, SubmissionFile])],
+  controllers: [MilestoneController],
+  providers: [MilestoneService],
+  exports: [MilestoneService],
 })
 export class MilestoneModule {}

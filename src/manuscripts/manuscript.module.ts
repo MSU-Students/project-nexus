@@ -5,9 +5,9 @@ import { ManuscriptController } from './manuscript.controller';
 import { ManuscriptService } from './manuscript.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Manuscript])],
-    controllers: [ManuscriptController],
-    providers: [ManuscriptService],
-    exports: [ManuscriptService],
+  imports: [TypeOrmModule.forFeature([Manuscript])],
+  controllers: [ManuscriptController],
+  providers: [ManuscriptService],
+  exports: [ManuscriptService],
 })
 export class ManuscriptModule {}

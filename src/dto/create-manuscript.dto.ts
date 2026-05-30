@@ -1,18 +1,18 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateManuscriptDto {
-    @ApiProperty()
-    projectId: number;
+  @ApiProperty()
+  projectId: number;
 
-    @ApiProperty()
-    title: string;
+  @ApiProperty()
+  title: string;
 
-    @ApiProperty()
-    filePath: string;
+  @ApiProperty()
+  filePath: string;
 
-    @ApiPropertyOptional()
-    status?: string;
+  @ApiPropertyOptional()
+  status?: string;
 
-    @ApiPropertyOptional()
-    remarks?: string;
+  @ApiPropertyOptional()
+  remarks?: string;
 }

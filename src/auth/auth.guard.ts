@@ -1,4 +1,3 @@
-
 import {
   CanActivate,
   ExecutionContext,
@@ -12,13 +11,16 @@ import { IS_ANONYMOUS } from 'src/decorators';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService, private reflector: Reflector) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private reflector: Reflector,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isAnonymous = this.reflector.getAllAndOverride<boolean>(IS_ANONYMOUS, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const isAnonymous = this.reflector.getAllAndOverride<boolean>(
+      IS_ANONYMOUS,
+      [context.getHandler(), context.getClass()],
+    );
     if (isAnonymous) {
       return true;
     }
@@ -29,7 +31,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
     try {
-      // 💡 Here the JWT secret key that's used for verifying the payload 
+      // 💡 Here the JWT secret key that's used for verifying the payload
       // is the key that was passed in the JwtModule
       const payload = await this.jwtService.verifyAsync(token);
       // 💡 We're assigning the payload to the request object here

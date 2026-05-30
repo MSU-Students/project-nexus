@@ -12,4 +12,4 @@ import { DefenseSchedule } from 'src/entities/defense-schedule.entity';
   providers: [PanelAssignmentService],
   exports: [PanelAssignmentService],
 })
-export class PanelAssignmentModule { }
+export class PanelAssignmentModule {}

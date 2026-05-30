@@ -7,11 +7,11 @@ import { ProjectService } from './project.service';
 import { MilestoneModule } from 'src/milestone/milestone.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Project, ProjectStageHistory]),
-        forwardRef(() => MilestoneModule),
-    ],
-    controllers: [ProjectController],
-    providers: [ProjectService],
+  imports: [
+    TypeOrmModule.forFeature([Project, ProjectStageHistory]),
+    forwardRef(() => MilestoneModule),
+  ],
+  controllers: [ProjectController],
+  providers: [ProjectService],
 })
 export class ProjectModule {}

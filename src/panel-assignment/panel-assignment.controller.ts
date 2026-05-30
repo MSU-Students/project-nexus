@@ -16,7 +16,7 @@ import { AssignPanelDto, RemovePanelDto } from 'src/dto';
 @ApiBearerAuth()
 @Controller('panel-assignments')
 export class PanelAssignmentController {
-  constructor(private readonly panelService: PanelAssignmentService) { }
+  constructor(private readonly panelService: PanelAssignmentService) {}
 
   @Post()
   @Roles(Role.ADMIN)

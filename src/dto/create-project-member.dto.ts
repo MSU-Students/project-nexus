@@ -1,12 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateProjectMemberDto {
-    @ApiProperty()
-    projectId: number;
+  @ApiProperty()
+  projectId: number;
 
-    @ApiProperty()
-    userId: number;
+  @ApiProperty()
+  userId: number;
 
-    @ApiPropertyOptional()
-    roleInProject?: string;
+  @ApiPropertyOptional()
+  roleInProject?: string;
 }

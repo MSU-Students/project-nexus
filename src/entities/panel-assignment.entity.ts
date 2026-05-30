@@ -18,7 +18,10 @@ export class PanelAssignment {
   @JoinColumn({ name: 'schedule_id' })
   schedule: any;
 
-  @ManyToOne(() => User, (user) => user.panelAssignments, { eager: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.panelAssignments, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'faculty_id' })
   faculty: User;
 

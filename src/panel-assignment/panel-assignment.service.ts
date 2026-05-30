@@ -21,12 +21,15 @@ export class PanelAssignmentService {
 
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
-  ) { }
+  ) {}
 
   async assign(dto: AssignPanelDto): Promise<PanelAssignment> {
     // 1. Check faculty exists and is FACULTY role
-    const faculty = await this.userRepo.findOne({ where: { id: dto.facultyId } });
-    if (!faculty) throw new NotFoundException(`User #${dto.facultyId} not found`);
+    const faculty = await this.userRepo.findOne({
+      where: { id: dto.facultyId },
+    });
+    if (!faculty)
+      throw new NotFoundException(`User #${dto.facultyId} not found`);
     if (faculty.role !== Role.ADVISER) {
       throw new BadRequestException(`User #${dto.facultyId} is not an adviser`);
     }
@@ -85,7 +88,9 @@ export class PanelAssignmentService {
     }
 
     await this.panelRepo.remove(assignment);
-    return { message: `Faculty #${dto.facultyId} removed from schedule #${dto.scheduleId}` };
+    return {
+      message: `Faculty #${dto.facultyId} removed from schedule #${dto.scheduleId}`,
+    };
   }
 
   async findBySchedule(scheduleId: number): Promise<PanelAssignment[]> {

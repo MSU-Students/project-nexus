@@ -10,4 +10,4 @@ import { DefenseScheduleService } from './defense-schedule.service';
   providers: [DefenseScheduleService],
   exports: [DefenseScheduleService], // exported so Task 2 (panel module) can use it later
 })
-export class DefenseScheduleModule { }
+export class DefenseScheduleModule {}

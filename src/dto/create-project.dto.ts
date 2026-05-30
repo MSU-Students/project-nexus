@@ -1,27 +1,27 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateProjectDto {
-    @ApiProperty()
-    title: string;
+  @ApiProperty()
+  title: string;
 
-    @ApiPropertyOptional()
-    abstract?: string;
+  @ApiPropertyOptional()
+  abstract?: string;
 
-    @ApiPropertyOptional()
-    description?: string;
+  @ApiPropertyOptional()
+  description?: string;
 
-    @ApiPropertyOptional()
-    stageId?: number;
+  @ApiPropertyOptional()
+  stageId?: number;
 
-    @ApiPropertyOptional()
-    groupId?: number;
+  @ApiPropertyOptional()
+  groupId?: number;
 
-    @ApiPropertyOptional()
-    adviserId?: number;
+  @ApiPropertyOptional()
+  adviserId?: number;
 
-    @ApiPropertyOptional()
-    year?: string;
+  @ApiPropertyOptional()
+  year?: string;
 
-    @ApiPropertyOptional()
-    techStack?: string;
+  @ApiPropertyOptional()
+  techStack?: string;
 }

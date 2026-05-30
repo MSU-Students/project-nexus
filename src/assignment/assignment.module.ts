@@ -5,8 +5,8 @@ import { AssignmentController } from './assignment.controller';
 import { AssignmentService } from './assignment.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([AdviserAssignment])],
-    controllers: [AssignmentController],
-    providers: [AssignmentService],
+  imports: [TypeOrmModule.forFeature([AdviserAssignment])],
+  controllers: [AssignmentController],
+  providers: [AssignmentService],
 })
 export class AssignmentModule {}
