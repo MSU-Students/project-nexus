@@ -16,14 +16,40 @@ export class ManuscriptService {
     return this.repo.save(manuscript);
   }
 
+  async uploadFile(
+    file: Express.Multer.File,
+    projectId: number,
+    uploadedById: number,
+    title?: string,
+  ): Promise<Manuscript> {
+    const latest = await this.repo.findOne({
+      where: { projectId },
+      order: { version: 'DESC' },
+    });
+    const nextVersion = latest ? latest.version + 1 : 1;
+
+    const manuscript = this.repo.create({
+      projectId,
+      title: title ?? file.originalname,
+      fileName: file.filename,
+      originalName: file.originalname,
+      filePath: file.path,
+      fileSize: file.size,
+      mimeType: file.mimetype,
+      uploadedById,
+      version: nextVersion,
+    });
+    return this.repo.save(manuscript);
+  }
+
   async findAll(): Promise<Manuscript[]> {
     return this.repo.find({
       relations: ['project'],
-      order: { submittedAt: 'DESC' },
+      order: { createdAt: 'DESC' },
     });
   }
 
-  async findOne(id: number): Promise<Manuscript> {
+  async findOne(id: string): Promise<Manuscript> {
     const manuscript = await this.repo.findOne({
       where: { id },
       relations: ['project'],
@@ -35,11 +61,11 @@ export class ManuscriptService {
   async findByProject(projectId: number): Promise<Manuscript[]> {
     return this.repo.find({
       where: { projectId },
-      order: { submittedAt: 'DESC' },
+      order: { createdAt: 'DESC' },
     });
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const manuscript = await this.findOne(id);
     await this.repo.remove(manuscript);
   }
