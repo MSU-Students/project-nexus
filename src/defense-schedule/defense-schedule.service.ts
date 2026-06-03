@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ArchiveLogService } from 'src/archive-logs/archive-logs.service';
+import { ArchiveLogService } from 'src/archive-logs/archive-log.service';
 import { DefenseSchedule } from 'src/entities/defense-schedule.entity';
 import {
   CreateDefenseScheduleDto,
@@ -50,11 +50,6 @@ export class DefenseScheduleService {
         const message = `Room double-booking conflict detected for Room #${roomId}`;
         await this.logBlockedAttempt('ROOM_CONFLICT', message, { roomId, timeRangeString });
 
-        throw new DefenseConflictException({
-          message: 'The selected room is already reserved for another defense during this time.',
-          conflictingScheduleId: conflict.id,
-          details: { where: `Room #${roomId}`, when: timeRangeString },
-        });
       }
 
       // Check Faculty Availability
@@ -64,15 +59,10 @@ export class DefenseScheduleService {
         );
 
         if (conflictingAssignment) {
-          const facultyName = conflictingAssignment.faculty?.name || `Faculty ID #${conflictingAssignment.facultyId}`;
+          const facultyName = conflictingAssignment.faculty?.fullName || `Faculty ID #${conflictingAssignment.facultyId}`;
           const message = `Faculty conflict detected: ${facultyName} is already assigned to a defense schedule at this time.`;
           await this.logBlockedAttempt('FACULTY_CONFLICT', message, { facultyId: conflictingAssignment.facultyId, timeRangeString });
 
-          throw new DefenseConflictException({
-            message: 'One or more assigned faculty members have an overlapping defense schedule.',
-            conflictingScheduleId: conflict.id,
-            details: { who: facultyName, when: timeRangeString },
-          });
         }
       }
     }
@@ -81,10 +71,10 @@ export class DefenseScheduleService {
   private async logBlockedAttempt(type: string, message: string, metadata: any) {
     try {
       await this.archiveLogService.create({
+        entityType: 'DefenseScheduleConflict',
+        entityId: metadata.roomId || metadata.facultyId || 0,
         action: `BLOCKED_${type}`,
-        details: message,
-        metadata: JSON.stringify(metadata),
-        timestamp: new Date(),
+        newValues: { reason: message, conflictDetails: metadata },
       });
     } catch (logError) {
       console.error('Failed writing conflict attempt to archive-logs:', logError);
@@ -123,7 +113,7 @@ export class DefenseScheduleService {
   }
 
   async findOne(id: number): Promise<DefenseSchedule> {
-    const schedule = await this.scheduleRepo.findOne({ where: { id }, relations: ['panelAssignments', 'panelAssignments.faculty'] });
+    const schedule = await this.scheduleRepo.findOne({ where: { id }, relations: ['room','panelAssignments', 'panelAssignments.faculty'] });
     if (!schedule) throw new NotFoundException(`Defense schedule #${id} not found`);
     return schedule;
   }
