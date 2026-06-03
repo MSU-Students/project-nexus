@@ -1,4 +1,5 @@
 import {
+  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
@@ -22,8 +23,12 @@ export class PanelAssignment {
     eager: true,
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'faculty_id' })
-  faculty: User;
+  @Column({ name: 'faculty_id' })
+  facultyId: number;
+
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'facultyId' })
+  faculty!: User;
 
   @CreateDateColumn()
   assignedAt: Date;
