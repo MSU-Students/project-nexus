@@ -2,7 +2,6 @@ import {
     BadRequestException,
     Body,
     Controller,
-    Get,
     Param,
     ParseIntPipe,
     Patch,
@@ -16,8 +15,8 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { MilestoneService } from './milestone.service';
-import { CreateProjectMilestoneDto } from 'src/dto/create-project-milestone.dto';
 import { RejectMilestoneDto } from 'src/dto/reject-milestone.dto';
+import { AuditEvent } from 'src/decorators';
 
 @ApiBearerAuth()
 @ApiTags('milestones')
@@ -27,12 +26,14 @@ export class MilestoneController {
 
     // PATCH /milestones/:id/approve
     @Patch('milestones/:id/approve')
+    @AuditEvent({ action: 'APPROVE_MILESTONE', module: 'MILESTONE', table: 'project_milestones' })
     approve(@Param('id', ParseIntPipe) id: number) {
         return this.milestoneService.approve(id);
     }
 
     // PATCH /milestones/:id/reject
     @Patch('milestones/:id/reject')
+    @AuditEvent({ action: 'REJECT_MILESTONE', module: 'MILESTONE', table: 'project_milestones' })
     reject(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: RejectMilestoneDto,
@@ -54,6 +55,7 @@ export class MilestoneController {
             }),
         }),
     )
+    @AuditEvent({ action: 'UPLOAD_MANUSCRIPT', module: 'MILESTONE', table: 'submission_files' })
     uploadFile(
         @Param('id', ParseIntPipe) id: number,
         @UploadedFile() file: Express.Multer.File,

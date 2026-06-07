@@ -6,13 +6,16 @@ import { AuthModule } from './auth/auth.module';
 import { ProjectModule } from './project/project.module';
 import { AssignmentModule } from './assignment/assignment.module';
 import { MilestoneModule } from './milestone/milestone.module';
-import { APP_GUARD } from '@nestjs/core';
+import { AuditModule } from './audit/audit.module';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { RolesGuard } from './guards';
 import { AuthGuard } from './auth/auth.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DefenseSchedule } from './entities/defense-schedule.entity';
 import { PanelAssignment } from './entities/panel-assignment.entity';
+import { AuditLog } from './audit/audit-log.entity';
+import { AuditInterceptor } from './audit/audit.interceptor';
 import {
   User,
   Stage,
@@ -57,6 +60,7 @@ import {
           SubmissionFile,
           DefenseSchedule,
           PanelAssignment,
+          AuditLog,
         ],
         synchronize: true,
       }),
@@ -67,6 +71,7 @@ import {
     ProjectModule,
     AssignmentModule,
     MilestoneModule,
+    AuditModule,
   ],
   controllers: [AppController],
   providers: [
@@ -78,6 +83,10 @@ import {
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AuditInterceptor,
     },
   ],
 })

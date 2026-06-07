@@ -14,6 +14,7 @@ import { MilestoneService } from 'src/milestone/milestone.service';
 import { CreateProjectDto } from 'src/dto/create-project.dto';
 import { UpdateProjectStageDto } from 'src/dto/update-project-stage.dto';
 import { CreateProjectMilestoneDto } from 'src/dto/create-project-milestone.dto';
+import { AuditEvent } from 'src/decorators';
 
 @ApiBearerAuth()
 @ApiTags('projects')
@@ -26,6 +27,7 @@ export class ProjectController {
 
     // POST /projects
     @Post()
+    @AuditEvent({ action: 'CREATE_PROJECT', module: 'PROJECT', table: 'projects' })
     create(@Body() dto: CreateProjectDto) {
         return this.projectService.create(dto);
     }
@@ -44,6 +46,7 @@ export class ProjectController {
 
     // PATCH /projects/:id/stage
     @Patch(':id/stage')
+    @AuditEvent({ action: 'UPDATE_PROJECT_STAGE', module: 'PROJECT', table: 'projects' })
     updateStage(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: UpdateProjectStageDto,
@@ -61,6 +64,7 @@ export class ProjectController {
 
     // POST /projects/:id/milestones
     @Post(':id/milestones')
+    @AuditEvent({ action: 'ADD_PROJECT_MILESTONE', module: 'PROJECT', table: 'project_milestones' })
     addMilestone(
         @Param('id', ParseIntPipe) projectId: number,
         @Body() dto: CreateProjectMilestoneDto,

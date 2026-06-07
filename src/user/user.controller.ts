@@ -1,13 +1,11 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UserService } from './user.service';
-import { Anonymous, Roles } from 'src/decorators';
-import { Role } from 'src/enums';
+import { Anonymous, AuditEvent } from 'src/decorators';
 import { CreateUserDto } from 'src/dto/create-user.dto';
-import { RolesGuard } from 'src/guards';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiBearerAuth()
+@ApiTags('users')
 @Controller('user')
 export class UserController {
     constructor(private readonly service: UserService) { }
@@ -21,6 +19,7 @@ export class UserController {
     @Post()
     // @Roles(Role.Admin)
     @Anonymous()
+    @AuditEvent({ action: 'CREATE_USER', module: 'USER', table: 'users' })
     create(@Body() createDto: CreateUserDto) {
         return this.service.create(createDto);
     }

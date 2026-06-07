@@ -9,7 +9,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { Roles } from 'src/decorators';
+import { Roles, AuditEvent } from 'src/decorators';
 import { Role } from 'src/enums';
 import { DefenseScheduleService } from './defense-schedule.service';
 import {
@@ -17,7 +17,10 @@ import {
   FilterDefenseScheduleDto,
   UpdateDefenseScheduleDto,
 } from 'src/dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('defense-schedules')
 @Controller('defense-schedules')
 export class DefenseScheduleController {
   constructor(private readonly scheduleService: DefenseScheduleService) { }
@@ -25,6 +28,7 @@ export class DefenseScheduleController {
   // Only COORDINATOR can create
   @Post()
   @Roles(Role.COORDINATOR)
+  @AuditEvent({ action: 'CREATE_DEFENSE_SCHEDULE', module: 'DEFENSE_SCHEDULE', table: 'defense_schedules' })
   create(@Body() dto: CreateDefenseScheduleDto) {
     return this.scheduleService.create(dto);
   }
@@ -44,6 +48,7 @@ export class DefenseScheduleController {
   // Only COORDINATOR can update
   @Patch(':id')
   @Roles(Role.COORDINATOR)
+  @AuditEvent({ action: 'UPDATE_DEFENSE_SCHEDULE', module: 'DEFENSE_SCHEDULE', table: 'defense_schedules' })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateDefenseScheduleDto,
@@ -54,6 +59,7 @@ export class DefenseScheduleController {
   // Only COORDINATOR can delete
   @Delete(':id')
   @Roles(Role.COORDINATOR)
+  @AuditEvent({ action: 'DELETE_DEFENSE_SCHEDULE', module: 'DEFENSE_SCHEDULE', table: 'defense_schedules' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.scheduleService.remove(id);
   }

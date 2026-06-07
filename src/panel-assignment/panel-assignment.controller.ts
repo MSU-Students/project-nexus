@@ -7,25 +7,28 @@ import {
   ParseIntPipe,
   Post,
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
-import { Roles } from 'src/decorators';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles, AuditEvent } from 'src/decorators';
 import { Role } from 'src/enums';
 import { PanelAssignmentService } from './panel-assignment.service';
 import { AssignPanelDto, RemovePanelDto } from 'src/dto';
 
 @ApiBearerAuth()
+@ApiTags('panel-assignments')
 @Controller('panel-assignments')
 export class PanelAssignmentController {
   constructor(private readonly panelService: PanelAssignmentService) { }
 
   @Post()
   @Roles(Role.COORDINATOR)
+  @AuditEvent({ action: 'ASSIGN_PANEL', module: 'PANEL_ASSIGNMENT', table: 'panel_assignments' })
   assign(@Body() dto: AssignPanelDto) {
     return this.panelService.assign(dto);
   }
 
   @Delete()
   @Roles(Role.COORDINATOR)
+  @AuditEvent({ action: 'REMOVE_PANEL', module: 'PANEL_ASSIGNMENT', table: 'panel_assignments' })
   remove(@Body() dto: RemovePanelDto) {
     return this.panelService.remove(dto);
   }
