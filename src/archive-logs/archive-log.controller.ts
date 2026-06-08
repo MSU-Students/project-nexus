@@ -10,9 +10,12 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ArchiveLogService } from './archive-log.service';
 import { CreateArchiveLogDto } from 'src/dto/create-archive-log.dto';
+import { Roles } from 'src/decorators';
+import { Role } from 'src/enums';
 
 @ApiBearerAuth()
 @ApiTags('archive-logs')
+@Roles(Role.ADMIN)
 @Controller('archive-logs')
 export class ArchiveLogController {
   constructor(private readonly service: ArchiveLogService) {}

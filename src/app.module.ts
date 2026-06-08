@@ -11,9 +11,10 @@ import { ManuscriptModule } from './manuscripts/manuscript.module';
 import { ArchiveLogModule } from './archive-logs/archive-log.module';
 import { DefenseScheduleModule } from './defense-schedule/defense-schedule.module';
 import { PanelAssignmentModule } from './panel-assignment/panel-assignment.module';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { RolesGuard } from './guards';
 import { AuthGuard } from './auth/auth.guard';
+import { AuditLogInterceptor } from './archive-logs/audit-log.interceptor';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DefenseSchedule } from './entities/defense-schedule.entity';
@@ -94,6 +95,10 @@ import {
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AuditLogInterceptor,
     },
   ],
 })
