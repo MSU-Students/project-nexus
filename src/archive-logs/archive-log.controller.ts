@@ -30,7 +30,7 @@ export class ArchiveLogController {
   @Get('entity')
   findByEntity(
     @Query('entityType') entityType: string,
-    @Query('entityId', ParseIntPipe) entityId: number,
+    @Query('entityId') entityId: string,
   ) {
     return this.service.findByEntity(entityType, entityId);
   }

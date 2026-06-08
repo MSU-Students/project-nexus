@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Post,
   Request,
+  UnauthorizedException,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -53,6 +54,9 @@ export class ManuscriptController {
       throw new BadRequestException('No file uploaded');
     }
     const uploadedById: number | undefined = req.user?.sub ?? req.user?.id;
+    if (!uploadedById) {
+      throw new UnauthorizedException('User is not authenticated');
+    }
     return this.service.uploadFile(file, projectId, uploadedById, title);
   }
 

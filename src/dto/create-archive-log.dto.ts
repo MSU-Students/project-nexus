@@ -5,10 +5,19 @@ export class CreateArchiveLogDto {
   entityType: string;
 
   @ApiProperty()
-  entityId: number;
+  entityId: string | number;
 
   @ApiProperty()
   action: string;
+
+  @ApiPropertyOptional()
+  userRole?: string;
+
+  @ApiPropertyOptional()
+  ipAddress?: string;
+
+  @ApiPropertyOptional()
+  deviceInfo?: string;
 
   @ApiPropertyOptional()
   changedById?: number;

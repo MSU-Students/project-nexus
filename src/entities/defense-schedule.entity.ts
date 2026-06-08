@@ -48,7 +48,7 @@ export class DefenseSchedule {
   })
   status: ScheduleStatus;
 
-  @OneToMany(() => PanelAssignment, (panelAssignment) => panelAssignment.defenseSchedule)
+  @OneToMany(() => PanelAssignment, (panelAssignment) => panelAssignment.schedule)
   panelAssignments!: PanelAssignment[];
 
   @CreateDateColumn()

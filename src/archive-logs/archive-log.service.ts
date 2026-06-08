@@ -12,7 +12,10 @@ export class ArchiveLogService {
   ) {}
 
   async create(dto: CreateArchiveLogDto): Promise<ArchiveLog> {
-    const log = this.repo.create(dto);
+    const log = this.repo.create({
+      ...dto,
+      entityId: dto.entityId !== undefined && dto.entityId !== null ? String(dto.entityId) : undefined,
+    });
     return this.repo.save(log);
   }
 
@@ -25,10 +28,10 @@ export class ArchiveLogService {
 
   async findByEntity(
     entityType: string,
-    entityId: number,
+    entityId: string | number,
   ): Promise<ArchiveLog[]> {
     return this.repo.find({
-      where: { entityType, entityId },
+      where: { entityType, entityId: String(entityId) },
       relations: ['changedBy'],
       order: { createdAt: 'DESC' },
     });
