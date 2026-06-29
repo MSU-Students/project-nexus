@@ -29,4 +29,11 @@ export class AuthController {
   getProfile(@Request() req) {
     return req.user;
   }
+
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  logout() {
+    return { message: 'Logged out successfully' };
+  }
 }

@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString, Matches } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, Matches, IsArray, IsInt} from 'class-validator';
 import {
   DefenseType,
   ScheduleStatus,
@@ -27,7 +27,12 @@ export class CreateDefenseScheduleDto {
 
   @IsNotEmpty({ message: 'room is required' })
   @IsString()
-  room: string;
+  roomId: number;
+
+  @IsNotEmpty({ message: 'facultyIds array is required' })
+  @IsArray({ message: 'facultyIds must be an array of faculty IDs' })
+  @IsInt({ each: true, message: 'Each faculty ID must be an integer' })
+  facultyIds: number[];
 }
 
 export class UpdateDefenseScheduleDto {
@@ -46,7 +51,11 @@ export class UpdateDefenseScheduleDto {
   endTime?: string;
 
   @IsString()
-  room?: string;
+  roomId?: number;
+
+  @IsArray({ message: 'facultyIds must be an array' })
+  @IsInt({ each: true, message: 'Each faculty ID must be an integer' })
+  facultyIds?: number[];
 
   @IsEnum(ScheduleStatus, {
     message: 'status must be SCHEDULED, ONGOING, COMPLETED, or CANCELLED',

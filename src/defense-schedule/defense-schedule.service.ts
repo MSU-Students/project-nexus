@@ -1,11 +1,8 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { DefenseSchedule, ScheduleStatus } from 'src/entities/defense-schedule.entity';
+import { ArchiveLogService } from 'src/archive-logs/archive-log.service';
+import { DefenseSchedule } from 'src/entities/defense-schedule.entity';
 import {
   CreateDefenseScheduleDto,
   FilterDefenseScheduleDto,
@@ -20,32 +17,85 @@ import {
   scheduleCancelledEmail,
 } from 'src/notification/email-templates';
 
+
 @Injectable()
 export class DefenseScheduleService {
   constructor(
     @InjectRepository(DefenseSchedule)
     private readonly scheduleRepo: Repository<DefenseSchedule>,
-
-    @InjectRepository(PanelAssignment)
-    private readonly panelRepo: Repository<PanelAssignment>,
-
-    private readonly notificationService: NotificationService,
-    private readonly config: ConfigService,
+    private readonly archiveLogService: ArchiveLogService,
   ) { }
+  
+  private async checkConflicts(
+    startTime: string | Date,
+    endTime: string | Date,
+    roomId: number,
+    facultyIds: number[],
+    excludeScheduleId?: number,
+  ): Promise<void> {
+    const formattedStart = startTime instanceof Date ? startTime.toISOString() : startTime;
+    const formattedEnd = endTime instanceof Date ? endTime.toISOString() : endTime;
+    const timeRangeString = `${formattedStart} to ${formattedEnd}`;
 
-  // ── Helper: collect panelist emails for a schedule ──
-  private async getPanelistEmails(scheduleId: number): Promise<string[]> {
-    const assignments = await this.panelRepo.find({
-      where: { schedule: { id: scheduleId } },
-      relations: ['faculty'],
-    });
-    return assignments.map((a) => a.faculty?.email).filter(Boolean) as string[];
+    const query = this.scheduleRepo
+      .createQueryBuilder('schedule')
+      .leftJoinAndSelect('schedule.panelAssignments', 'panelAssignment')
+      .leftJoinAndSelect('panelAssignment.faculty', 'faculty')
+      .where(
+        '(schedule.startTime, schedule.endTime) OVERLAPS (:startTime::timestamp, :endTime::timestamp)',
+        { startTime: formattedStart, endTime: formattedEnd },
+      );
+
+    if (excludeScheduleId) {
+      query.andWhere('schedule.id != :excludeScheduleId', { excludeScheduleId });
+    }
+
+    const overlappingSchedules = await query.getMany();
+
+    for (const conflict of overlappingSchedules) {
+      // Check Room Double-Booking
+      if (conflict.roomId === roomId) {
+        const message = `Room double-booking conflict detected for Room #${roomId}`;
+        await this.logBlockedAttempt('ROOM_CONFLICT', message, { roomId, timeRangeString });
+
+      }
+
+      // Check Faculty Availability
+      if (conflict.panelAssignments && facultyIds?.length > 0) {
+        const conflictingAssignment = conflict.panelAssignments.find((pa) =>
+          facultyIds.includes(pa.facultyId),
+        );
+
+        if (conflictingAssignment) {
+          const facultyName = conflictingAssignment.faculty?.fullName || `Faculty ID #${conflictingAssignment.facultyId}`;
+          const message = `Faculty conflict detected: ${facultyName} is already assigned to a defense schedule at this time.`;
+          await this.logBlockedAttempt('FACULTY_CONFLICT', message, { facultyId: conflictingAssignment.facultyId, timeRangeString });
+
+        }
+      }
+    }
+  }
+
+  private async logBlockedAttempt(type: string, message: string, metadata: any) {
+    try {
+      await this.archiveLogService.create({
+        entityType: 'DefenseScheduleConflict',
+        entityId: metadata.roomId || metadata.facultyId || 0,
+        action: `BLOCKED_${type}`,
+        newValues: { reason: message, conflictDetails: metadata },
+      });
+    } catch (logError) {
+      console.error('Failed writing conflict attempt to archive-logs:', logError);
+    }
   }
 
   async create(dto: CreateDefenseScheduleDto): Promise<DefenseSchedule> {
     if (dto.startTime >= dto.endTime) {
       throw new BadRequestException('startTime must be before endTime');
     }
+
+    await this.checkConflicts(dto.startTime, dto.endTime, dto.roomId, dto.facultyIds);
+
     const schedule = this.scheduleRepo.create(dto);
     const saved = await this.scheduleRepo.save(schedule);
 
@@ -84,14 +134,15 @@ export class DefenseScheduleService {
     if (filter.date) {
       query.andWhere('schedule.date = :date', { date: filter.date });
     }
+
     query.orderBy('schedule.date', 'ASC').addOrderBy('schedule.startTime', 'ASC');
+
     return query.getMany();
   }
 
   async findOne(id: number): Promise<DefenseSchedule> {
-    const schedule = await this.scheduleRepo.findOne({ where: { id } });
-    if (!schedule)
-      throw new NotFoundException(`Defense schedule #${id} not found`);
+    const schedule = await this.scheduleRepo.findOne({ where: { id }, relations: ['room','panelAssignments', 'panelAssignments.faculty'] });
+    if (!schedule) throw new NotFoundException(`Defense schedule #${id} not found`);
     return schedule;
   }
 
@@ -104,10 +155,10 @@ export class DefenseScheduleService {
       throw new BadRequestException('startTime must be before endTime');
     }
 
-    const wasCancelled =
-      dto.status === ScheduleStatus.CANCELLED &&
-      schedule.status !== ScheduleStatus.CANCELLED;
+    const targetRoomId = dto.roomId ?? schedule.roomId;
+    const targetFacultyIds = dto.facultyIds ?? schedule.panelAssignments?.map(pa => pa.facultyId) ?? [];
 
+    await this.checkConflicts(newStart, newEnd, targetRoomId, targetFacultyIds, id);
     Object.assign(schedule, dto);
     const saved = await this.scheduleRepo.save(schedule);
 
@@ -141,48 +192,5 @@ export class DefenseScheduleService {
     return { message: `Defense schedule #${id} deleted successfully` };
   }
 
-  // ── Calendar endpoint: returns FullCalendar-shaped events ──
-  async getCalendarEvents(userId: number, userRole: string): Promise<any[]> {
-    const schedules = await this.scheduleRepo.find({
-      order: { date: 'ASC', startTime: 'ASC' },
-    });
-
-    // Role-based filtering
-    let filtered = schedules;
-
-    if (userRole === 'adviser') {
-      // Faculty only sees schedules where they are a panelist
-      const assignments = await this.panelRepo.find({
-        where: { faculty: { id: userId } },
-        relations: ['schedule'],
-      });
-      const assignedIds = new Set(assignments.map((a) => a.schedule?.id));
-      filtered = schedules.filter((s) => assignedIds.has(s.id));
-    }
-    // COORDINATOR sees all (no filter)
-    // STUDENT filtering — add your own logic once student↔schedule relation is set up
-
-    return filtered.map((s) => ({
-      id: s.id,
-      title: `${s.defenseType.replace(/_/g, ' ')} — ${s.room}`,
-      start: `${s.date}T${s.startTime}`,
-      end: `${s.date}T${s.endTime}`,
-      color: this.colorForStatus(s.status),
-      extendedProps: {
-        defenseType: s.defenseType,
-        room: s.room,
-        status: s.status,
-      },
-    }));
-  }
-
-  private colorForStatus(status: ScheduleStatus): string {
-    const map: Record<ScheduleStatus, string> = {
-      [ScheduleStatus.SCHEDULED]: '#1a56db',
-      [ScheduleStatus.ONGOING]: '#f59e0b',
-      [ScheduleStatus.COMPLETED]: '#10b981',
-      [ScheduleStatus.CANCELLED]: '#ef4444',
-    };
-    return map[status] ?? '#6b7280';
-  }
+  
 }

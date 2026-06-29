@@ -16,11 +16,20 @@ export class ArchiveLog {
   @Column({ name: 'entity_type' })
   entityType: string;
 
-  @Column({ name: 'entity_id' })
-  entityId: number;
+  @Column({ name: 'entity_id', type: 'varchar', nullable: true })
+  entityId: string;
 
   @Column()
   action: string;
+
+  @Column({ name: 'user_role', nullable: true })
+  userRole: string;
+
+  @Column({ name: 'ip_address', nullable: true })
+  ipAddress: string;
+
+  @Column({ name: 'device_info', nullable: true })
+  deviceInfo: string;
 
   @Column({ name: 'changed_by', nullable: true })
   changedById: number;

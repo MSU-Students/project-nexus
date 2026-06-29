@@ -4,7 +4,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  OneToMany
 } from 'typeorm';
+import { PanelAssignment } from './panel-assignment.entity';
 
 export enum DefenseType {
   TITLE_DEFENSE = 'TITLE_DEFENSE',
@@ -37,7 +39,7 @@ export class DefenseSchedule {
   endTime: string;
 
   @Column()
-  room: string;
+  roomId: number;
 
   @Column({
     type: 'enum',
@@ -45,6 +47,9 @@ export class DefenseSchedule {
     default: ScheduleStatus.SCHEDULED,
   })
   status: ScheduleStatus;
+
+  @OneToMany(() => PanelAssignment, (panelAssignment) => panelAssignment.schedule)
+  panelAssignments!: PanelAssignment[];
 
   @CreateDateColumn()
   createdAt: Date;
