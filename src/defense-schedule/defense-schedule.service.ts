@@ -8,6 +8,14 @@ import {
   FilterDefenseScheduleDto,
   UpdateDefenseScheduleDto,
 } from 'src/dto';
+import { NotificationService } from 'src/notification/notification.service';
+import { PanelAssignment } from 'src/entities/panel-assignment.entity';
+import { ConfigService } from '@nestjs/config';
+import {
+  scheduleCreatedEmail,
+  scheduleUpdatedEmail,
+  scheduleCancelledEmail,
+} from 'src/notification/email-templates';
 
 
 @Injectable()
@@ -89,12 +97,32 @@ export class DefenseScheduleService {
     await this.checkConflicts(dto.startTime, dto.endTime, dto.roomId, dto.facultyIds);
 
     const schedule = this.scheduleRepo.create(dto);
-    return this.scheduleRepo.save(schedule);
+    const saved = await this.scheduleRepo.save(schedule);
+
+    // No panelists yet at creation time — notify coordinator or skip
+    // You can add coordinator email here if needed
+
+    return saved;
+  }
+
+  // Call this AFTER panelists are assigned (or you can call it from PanelAssignmentService)
+  async notifyCreated(scheduleId: number): Promise<void> {
+    const schedule = await this.findOne(scheduleId);
+    const emails = await this.getPanelistEmails(scheduleId);
+    const appUrl = this.config.get<string>('APP_URL', 'http://localhost:9000');
+
+    if (emails.length > 0) {
+      await this.notificationService.sendEmail({
+        to: emails,
+        subject: `New Defense Scheduled — ${schedule.defenseType} on ${schedule.date}`,
+        html: scheduleCreatedEmail(schedule, appUrl),
+        text: `A new ${schedule.defenseType} defense has been scheduled on ${schedule.date} at ${schedule.startTime} in room ${schedule.room}.`,
+      });
+    }
   }
 
   async findAll(filter: FilterDefenseScheduleDto): Promise<DefenseSchedule[]> {
     const query = this.scheduleRepo.createQueryBuilder('schedule');
-
     if (filter.defenseType) {
       query.andWhere('schedule.defenseType = :defenseType', {
         defenseType: filter.defenseType,
@@ -132,7 +160,30 @@ export class DefenseScheduleService {
 
     await this.checkConflicts(newStart, newEnd, targetRoomId, targetFacultyIds, id);
     Object.assign(schedule, dto);
-    return this.scheduleRepo.save(schedule);
+    const saved = await this.scheduleRepo.save(schedule);
+
+    const emails = await this.getPanelistEmails(id);
+    const appUrl = this.config.get<string>('APP_URL', 'http://localhost:9000');
+
+    if (emails.length > 0) {
+      if (wasCancelled) {
+        await this.notificationService.sendEmail({
+          to: emails,
+          subject: `Defense Cancelled — ${saved.defenseType} on ${saved.date}`,
+          html: scheduleCancelledEmail(saved),
+          text: `The ${saved.defenseType} defense on ${saved.date} has been cancelled.`,
+        });
+      } else {
+        await this.notificationService.sendEmail({
+          to: emails,
+          subject: `Defense Schedule Updated — ${saved.defenseType} on ${saved.date}`,
+          html: scheduleUpdatedEmail(saved, appUrl),
+          text: `The ${saved.defenseType} defense on ${saved.date} has been updated. Please check the portal.`,
+        });
+      }
+    }
+
+    return saved;
   }
 
   async remove(id: number): Promise<{ message: string }> {

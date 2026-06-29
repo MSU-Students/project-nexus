@@ -34,9 +34,13 @@ import {
   Manuscript,
   ArchiveLog,
 } from './entities';
+import { NotificationModule } from './notification/notification.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),   // top-level registration
+    NotificationModule,
     // Load .env globally so all modules can use ConfigService
     ConfigModule.forRoot({
       isGlobal: true,
@@ -102,4 +106,4 @@ import {
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

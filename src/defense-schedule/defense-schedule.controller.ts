@@ -1,3 +1,5 @@
+import { Request } from 'express';
+import { Req } from '@nestjs/common';
 import {
   Body,
   Controller,
@@ -20,7 +22,7 @@ import {
 
 @Controller('defense-schedules')
 export class DefenseScheduleController {
-  constructor(private readonly scheduleService: DefenseScheduleService) {}
+  constructor(private readonly scheduleService: DefenseScheduleService) { }
 
   // Only COORDINATOR can create
   @Post()
@@ -56,5 +58,10 @@ export class DefenseScheduleController {
   @Roles(Role.ADMIN)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.scheduleService.remove(id);
+  }
+  @Get('calendar')
+  getCalendarEvents(@Req() req: Request) {
+    const user = (req as any).user; // JWT payload: { sub: userId, role: userRole }
+    return this.defenseScheduleService.getCalendarEvents(user.sub, user.role);
   }
 }
