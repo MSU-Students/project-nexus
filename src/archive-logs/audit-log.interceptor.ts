@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { EntityManager } from 'typeorm';
 import { ArchiveLogService } from './archive-log.service';
 import { Request } from 'express';
+import { AuditAction } from 'src/enums';
 
 import { Manuscript } from 'src/entities/manuscript.entity';
 import { DefenseSchedule } from 'src/entities/defense-schedule.entity';
@@ -64,10 +65,10 @@ export class AuditLogInterceptor implements NestInterceptor {
         entityType = 'DefenseSchedule';
         entityId = id;
         if (method === 'PATCH' || method === 'PUT') {
-          action = 'UPDATE_DEFENSE_SCHEDULE';
+          action = AuditAction.UPDATE_DEFENSE_SCHEDULE;
           oldValues = await this.entityManager.findOne(DefenseSchedule, { where: { id } });
         } else if (method === 'DELETE') {
-          action = 'DELETE_DEFENSE_SCHEDULE';
+          action = AuditAction.DELETE_DEFENSE_SCHEDULE;
           oldValues = await this.entityManager.findOne(DefenseSchedule, { where: { id } });
         }
       } else if (cleanUrl.match(/^\/manuscripts\/[0-9a-fA-F-]{36}$/)) {
@@ -75,7 +76,11 @@ export class AuditLogInterceptor implements NestInterceptor {
         entityType = 'Manuscript';
         entityId = id;
         if (method === 'DELETE') {
-          action = 'DELETE_MANUSCRIPT';
+          action = AuditAction.DELETE_MANUSCRIPT;
+          oldValues = await this.entityManager.findOne(Manuscript, { where: { id } });
+        } else if (method === 'PATCH' || method === 'PUT') {
+          // Capture pre-update snapshot for UPDATE_MANUSCRIPT
+          action = AuditAction.UPDATE_MANUSCRIPT;
           oldValues = await this.entityManager.findOne(Manuscript, { where: { id } });
         }
       } else if (cleanUrl.match(/^\/assignments\/\d+$/)) {
@@ -83,7 +88,7 @@ export class AuditLogInterceptor implements NestInterceptor {
         entityType = 'AdviserAssignment';
         entityId = id;
         if (method === 'DELETE') {
-          action = 'REMOVE_ADVISER';
+          action = AuditAction.REMOVE_ADVISER;
           oldValues = await this.entityManager.findOne(AdviserAssignment, { where: { id } });
         }
       } else if (cleanUrl === '/panel-assignments' && method === 'DELETE') {
@@ -96,7 +101,7 @@ export class AuditLogInterceptor implements NestInterceptor {
           });
           if (record) {
             entityId = record.id;
-            action = 'REMOVE_PANELIST';
+            action = AuditAction.REMOVE_PANELIST;
             oldValues = record;
           }
         }
@@ -105,7 +110,9 @@ export class AuditLogInterceptor implements NestInterceptor {
         const id = parseInt(parts[parts.length - 2], 10);
         entityType = 'ProjectMilestone';
         entityId = id;
-        action = cleanUrl.endsWith('approve') ? 'APPROVE_MILESTONE' : 'REJECT_MILESTONE';
+        action = cleanUrl.endsWith('approve')
+          ? AuditAction.APPROVE_MILESTONE
+          : AuditAction.REJECT_MILESTONE;
         oldValues = await this.entityManager.findOne(ProjectMilestone, { where: { id } });
       }
     } catch (err) {
@@ -127,7 +134,7 @@ export class AuditLogInterceptor implements NestInterceptor {
                 userRole = decoded.roles?.[0] || decoded.role;
                 entityType = 'User';
                 entityId = decoded.sub;
-                action = 'LOGIN';
+                action = AuditAction.LOGIN;
                 newValues = { email: decoded.email };
               }
             } catch (jwtErr) {
@@ -137,7 +144,7 @@ export class AuditLogInterceptor implements NestInterceptor {
 
           // LOGOUT action
           else if (cleanUrl === '/auth/logout' && method === 'POST') {
-            action = 'LOGOUT';
+            action = AuditAction.LOGOUT;
             entityType = 'User';
             entityId = userId;
           }
@@ -146,12 +153,22 @@ export class AuditLogInterceptor implements NestInterceptor {
           else if (cleanUrl === '/manuscripts' && method === 'POST' && response) {
             entityType = 'Manuscript';
             entityId = response.id;
-            action = 'CREATE_MANUSCRIPT';
+            action = AuditAction.CREATE_MANUSCRIPT;
             newValues = response;
           } else if (cleanUrl === '/manuscripts/upload' && method === 'POST' && response) {
             entityType = 'Manuscript';
             entityId = response.id;
-            action = 'UPLOAD_MANUSCRIPT';
+            action = AuditAction.UPLOAD_MANUSCRIPT;
+            newValues = response;
+          }
+
+          // MANUSCRIPT Update — newValues from the controller response
+          else if (
+            cleanUrl.match(/^\/manuscripts\/[0-9a-fA-F-]{36}$/) &&
+            (method === 'PATCH' || method === 'PUT') &&
+            response
+          ) {
+            // action & oldValues already set in the pre-execution block above
             newValues = response;
           }
 
@@ -159,9 +176,13 @@ export class AuditLogInterceptor implements NestInterceptor {
           else if (cleanUrl === '/defense-schedules' && method === 'POST' && response) {
             entityType = 'DefenseSchedule';
             entityId = response.id;
-            action = 'CREATE_DEFENSE_SCHEDULE';
+            action = AuditAction.CREATE_DEFENSE_SCHEDULE;
             newValues = response;
-          } else if (cleanUrl.match(/^\/defense-schedules\/\d+$/) && (method === 'PATCH' || method === 'PUT') && response) {
+          } else if (
+            cleanUrl.match(/^\/defense-schedules\/\d+$/) &&
+            (method === 'PATCH' || method === 'PUT') &&
+            response
+          ) {
             newValues = response;
           }
 
@@ -169,7 +190,7 @@ export class AuditLogInterceptor implements NestInterceptor {
           else if (cleanUrl === '/assignments' && method === 'POST' && response) {
             entityType = 'AdviserAssignment';
             entityId = response.id;
-            action = 'ASSIGN_ADVISER';
+            action = AuditAction.ASSIGN_ADVISER;
             newValues = response;
           }
 
@@ -177,7 +198,7 @@ export class AuditLogInterceptor implements NestInterceptor {
           else if (cleanUrl === '/panel-assignments' && method === 'POST' && response) {
             entityType = 'PanelAssignment';
             entityId = response.id;
-            action = 'ASSIGN_PANELIST';
+            action = AuditAction.ASSIGN_PANELIST;
             newValues = response;
           }
 

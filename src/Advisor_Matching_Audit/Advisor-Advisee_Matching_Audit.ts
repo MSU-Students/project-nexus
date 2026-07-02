@@ -1,54 +1,81 @@
-import { Request, Response } from '@nestjs/common';
+/**
+ * Advisor-Advisee Matching Audit Helper
+ *
+ * Integrates advisor matching events into the central CLUTCHER audit trail
+ * by delegating to ArchiveLogService instead of logging to console only.
+ *
+ * Usage: inject AdvisorMatchingAuditHelper where advisor assignment logic runs,
+ * then call logAdvisorAssigned() / logAdvisorRemoved() after the DB operation.
+ */
+import { Injectable } from '@nestjs/common';
+import { ArchiveLogService } from 'src/archive-logs/archive-log.service';
+import { AuditAction } from 'src/enums';
 
-type AuditAction = 'ADVISOR_ASSIGNED' | 'ADVISOR_REMOVED';
+@Injectable()
+export class AdvisorMatchingAuditHelper {
+  constructor(private readonly archiveLogService: ArchiveLogService) {}
 
-interface AuditLogEntry {
-  actorId: string;
-  targetId: string;
-  action: AuditAction;
-  metadata: Record<string, any>;
-  timestamp: string;
-}
-
-const logMatchingActivity = async (
-  actorId: string,
-  targetId: string,
-  action: AuditAction,
-  metadata: Record<string, any> = {},
-): Promise<void> => {
-  const log: AuditLogEntry = {
-    actorId,
-    targetId,
-    action,
-    metadata,
-    timestamp: new Date().toISOString(),
-  };
-
-  console.log('[AUDIT_LOG]:', JSON.stringify(log, null, 2));
-};
-
-export const assignAdvisor = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const { advisorId, adviseeId } = req.body;
-
-    const actorId = req.user?.id || 'SYSTEM';
-
-    await logMatchingActivity(actorId, advisorId, 'ADVISOR_ASSIGNED', {
-      adviseeId,
-      reason: 'Standard assignment',
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'Advisor assigned successfully and activity logged.',
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to assign advisor or perform audit logging.',
+  /**
+   * Log an ASSIGN_ADVISER event.
+   *
+   * @param actorId    - ID of the user who performed the assignment
+   * @param actorRole  - Role of the actor (e.g. 'admin', 'coordinator')
+   * @param advisorId  - ID of the adviser entity being assigned
+   * @param adviseeId  - ID of the student/project being assigned to
+   * @param assignmentId - ID of the resulting AdviserAssignment record
+   * @param metadata   - Any extra context (reason, etc.)
+   */
+  async logAdvisorAssigned(
+    actorId: number,
+    actorRole: string,
+    advisorId: number,
+    adviseeId: number | string,
+    assignmentId?: number,
+    metadata: Record<string, any> = {},
+  ): Promise<void> {
+    await this.archiveLogService.create({
+      entityType: 'AdviserAssignment',
+      entityId: assignmentId !== undefined ? String(assignmentId) : String(advisorId),
+      action: AuditAction.ASSIGN_ADVISER,
+      userRole: actorRole,
+      changedById: actorId,
+      newValues: {
+        advisorId,
+        adviseeId,
+        ...metadata,
+      },
     });
   }
-};
+
+  /**
+   * Log a REMOVE_ADVISER event.
+   *
+   * @param actorId      - ID of the user who removed the assignment
+   * @param actorRole    - Role of the actor
+   * @param advisorId    - ID of the adviser being removed
+   * @param adviseeId    - ID of the student/project
+   * @param assignmentId - ID of the AdviserAssignment record that was removed
+   * @param metadata     - Any extra context (reason, etc.)
+   */
+  async logAdvisorRemoved(
+    actorId: number,
+    actorRole: string,
+    advisorId: number,
+    adviseeId: number | string,
+    assignmentId?: number,
+    metadata: Record<string, any> = {},
+  ): Promise<void> {
+    await this.archiveLogService.create({
+      entityType: 'AdviserAssignment',
+      entityId: assignmentId !== undefined ? String(assignmentId) : String(advisorId),
+      action: AuditAction.REMOVE_ADVISER,
+      userRole: actorRole,
+      changedById: actorId,
+      oldValues: {
+        advisorId,
+        adviseeId,
+        ...metadata,
+      },
+    });
+  }
+}
